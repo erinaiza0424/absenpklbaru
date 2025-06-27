@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Website</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <div class="container">
+        <div class="nav-btns">
+            <button id="formAbsenBtn" class="active">Formulir Absen PKL</button>
+            <button id="rekapBtn">Rekap Kehadiran</button>
+        </div>
+        <div id="formSection">
+            <h1>Absensi Siswa PKL</h1>
+            <form id="absenForm" class="absen-form">
+                <label for="nama">Nama Siswa</label>
+                <input type="text" id="nama" name="nama" required autocomplete="off" placeholder="Masukkan nama lengkap">
+
+                <label for="tanggal">Tanggal</label>
+                <input type="text" id="tanggal" name="tanggal" readonly>
+
+                <label for="waktu">Waktu</label>
+                <input type="text" id="waktu" name="waktu" readonly>
+
+                <label for="keterangan">Keterangan</label>
+                <select id="keterangan" name="keterangan" required>
+                    <option value="Hadir">Hadir</option>
+                    <option value="Izin">Izin</option>
+                    <option value="Sakit">Sakit</option>
+                    <option value="Alpa">Alpa</option>
+                </select>
+
+                <button type="submit" id="absenBtn">Absen Sekarang</button>
+            </form>
+            <div id="result"></div>
+        </div>
+    </div>
+    <div id="rekapSection" style="display:none;">
+        <div class="filter-bar">
+            <input type="text" id="searchNama" placeholder="Cari nama siswa...">
+            <input type="date" id="filterTanggal">
+            <button id="downloadExcel">Download Excel</button>
+        </div>
+        <canvas id="rekapChart" height="200"></canvas>
+        <div id="rekapTable"></div>
+    </div>
+    <div id="root"></div>
+    <script src="bundle.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Set tanggal dan waktu otomatis
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById('tanggal').value = now.toLocaleDateString('en-CA'); // format YYYY-MM-DD
+            document.getElementById('waktu').value = now.toLocaleTimeString();
+        }
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+
+        // Navigasi antar halaman
+        const formAbsenBtn = document.getElementById('formAbsenBtn');
+        const rekapBtn = document.getElementById('rekapBtn');
+        const formSection = document.getElementById('formSection');
+        const rekapSection = document.getElementById('rekapSection');
+
+        formAbsenBtn.onclick = () => {
+            formSection.style.display = '';
+            rekapSection.style.display = 'none';
+            formAbsenBtn.classList.add('active');
+            rekapBtn.classList.remove('active');
+            document.body.classList.remove('rekap-mode'); // Tambahkan baris ini
+            document.getElementById('result').innerText = '';
+        };
+        rekapBtn.onclick = () => {
+            formSection.style.display = 'none';
+            rekapSection.style.display = '';
+            formAbsenBtn.classList.remove('active');
+            rekapBtn.classList.add('active');
+            document.body.classList.add('rekap-mode'); // Tambahkan baris ini
+            loadRekap();
+        };
+
+        // Submit absen
+        document.getElementById('absenForm').onsubmit = function(e) {
+            e.preventDefault();
+            updateDateTime(); // pastikan tanggal & waktu terbaru
+            const nama = document.getElementById('nama').value.trim();
+            const tanggal = document.getElementById('tanggal').value;
+            const waktu = document.getElementById('waktu').value;
+            const keterangan = document.getElementById('keterangan').value;
+
+            if (!nama) {
+                document.getElementById('result').innerText = 'Nama harus diisi!';
+                return;
+            }
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+
+                    fetch('/absen', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            nama: nama,
+                            tanggal: tanggal,
+                            waktu: waktu,
+                            keterangan: keterangan,
+                            latitude: lat,
+                            longitude: lon
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            document.getElementById('result').innerText = 'Absen berhasil dan tersimpan!';
+                            document.getElementById('absenForm').reset();
+                            updateDateTime();
+                        } else {
+                            document.getElementById('result').innerText = 'Gagal simpan ke server!';
+                        }
+                    })
+                    .catch(() => {
+                        document.getElementById('result').innerText = 'Gagal simpan ke server!';
+                    });
+
+                }, function(error) {
+                    document.getElementById('result').innerText = 'Gagal mendapatkan lokasi!';
+                });
+            } else {
+                document.getElementById('result').innerText = 'Geolocation tidak didukung browser ini.';
+            }
+        };
+
+        // Rekap Kehadiran
+        let chart;
+        function loadRekap() {
+            fetch('/absensi')
+                .then(res => res.json())
+                .then(data => {
+                    // Filter & search
+                    const search = document.getElementById('searchNama').value.toLowerCase();
+                    const filterTgl = document.getElementById('filterTanggal').value;
+                    let filtered = data;
+                    if (search) filtered = filtered.filter(d => d.nama.toLowerCase().includes(search));
+                    if (filterTgl) filtered = filtered.filter(d => d.tanggal === filterTgl);
+
+                    // Hitung jumlah kehadiran per kategori
+                    const labels = ['Hadir', 'Izin', 'Sakit', 'Alpa'];
+                    const counts = labels.map(label => filtered.filter(d => d.keterangan === label).length);
+
+                    // Tampilkan chart
+                    const ctx = document.getElementById('rekapChart').getContext('2d');
+                    if (chart) chart.destroy();
+                    chart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Jumlah Kehadiran',
+                                data: counts,
+                                backgroundColor: ['#2193b0', '#fbc531', '#e17055', '#636e72']
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        precision: 0 // <-- angka bulat tanpa koma
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                    // Tampilkan tabel rekap
+                    let html = `<table class="rekap-table"><thead><tr>
+                        <th>Nama</th><th>Tanggal</th><th>Waktu</th><th>Keterangan</th><th>Lokasi</th>
+                    </tr></thead><tbody>`;
+                    filtered.forEach(d => {
+                        html += `<tr>
+                            <td>${d.nama}</td>
+                            <td>${d.tanggal}</td>
+                            <td>${d.waktu}</td>
+                            <td>${d.keterangan}</td>
+                            <td>${d.latitude}, ${d.longitude}</td>
+                        </tr>`;
+                    });
+                    html += '</tbody></table>';
+                    document.getElementById('rekapTable').innerHTML = html;
+                });
+        }
+
+        // Filter dan search event
+        document.getElementById('searchNama').oninput = loadRekap;
+        document.getElementById('filterTanggal').onchange = loadRekap;
+
+        // Download Excel
+        document.getElementById('downloadExcel').onclick = () => {
+            window.open('/absensi/export', '_blank');
+        };
+    </script>
+</body>
+</html>

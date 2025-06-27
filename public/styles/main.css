@@ -1,0 +1,389 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+body, input, select, button, table, th, td, .rekap-table {
+    font-family: 'Poppins', Arial, sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #6dd5ed 0%, #2193b0 100%);
+    font-family: 'Poppins', Arial, sans-serif;
+    min-height: 100vh;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.5s;
+}
+
+/* Efek glassmorphism pada container */
+.container {
+    background: rgba(255,255,255,0.75);
+    padding: 2.5rem 3rem;
+    border-radius: 20px;
+    box-shadow: 0 8px 32px 0 rgba(33,147,176,0.18), 0 1.5px 8px 0 rgba(33,147,176,0.13);
+    width: 420px;
+    max-width: 97vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    backdrop-filter: blur(12px);
+    border: 1.5px solid rgba(33,147,176,0.12);
+    transition: box-shadow 0.3s;
+    animation: fadeIn 0.7s;
+}
+.container:hover {
+    box-shadow: 0 12px 40px 0 rgba(33,147,176,0.22), 0 2px 12px 0 rgba(33,147,176,0.18);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(30px);}
+    to { opacity: 1; transform: translateY(0);}
+}
+
+h1 {
+    text-align: center;
+    color: #2193b0;
+    font-family: 'Poppins', Arial, sans-serif;
+    letter-spacing: 1px;
+    font-size: 2.1rem;
+    margin-bottom: 1.2rem;
+    text-shadow: 0 2px 8px #b2bec344;
+}
+
+.absen-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+}
+
+.absen-form label, .absen-form input, .absen-form select {
+    font-family: 'Poppins', Arial, sans-serif;
+}
+
+.absen-form label {
+    font-weight: 500;
+    color: #333;
+    align-self: center;
+}
+
+.absen-form input, .absen-form select {
+    padding: 0.6rem;
+    border: 1.5px solid #b2bec3;
+    border-radius: 8px;
+    font-size: 1.05rem;
+    width: 260px;
+    text-align: center;
+    background: #f8fafc;
+    transition: border 0.2s, box-shadow 0.2s, transform 0.15s;
+    box-shadow: 0 1px 4px #b2bec322;
+}
+.absen-form input:focus, .absen-form select:focus {
+    border: 1.5px solid #2193b0;
+    outline: none;
+    box-shadow: 0 2px 8px #2193b044;
+    transform: scale(1.04);
+}
+
+.absen-form button {
+    background: linear-gradient(90deg, #2193b0 60%, #6dd5ed 100%);
+    color: #fff;
+    border: none;
+    padding: 0.8rem;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.25s, transform 0.15s;
+    width: 260px;
+    box-shadow: 0 2px 8px #2193b033;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+.absen-form button::after {
+    content: "";
+    position: absolute;
+    left: 50%; top: 50%;
+    width: 0; height: 0;
+    background: rgba(255,255,255,0.3);
+    border-radius: 100%;
+    transform: translate(-50%, -50%);
+    transition: width 0.4s ease, height 0.4s ease, opacity 0.4s;
+    opacity: 0;
+    z-index: 0;
+}
+.absen-form button:active::after {
+    width: 200px; height: 200px;
+    opacity: 1;
+    transition: 0s;
+}
+.absen-form button:hover {
+    background: linear-gradient(90deg, #176b87 60%, #2193b0 100%);
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 4px 16px #2193b055;
+    filter: brightness(1.08) saturate(1.2);
+    letter-spacing: 0.5px;
+}
+
+#result {
+    margin-top: 1.2rem;
+    text-align: center;
+    font-weight: bold;
+    color: #2193b0;
+    font-family: 'Poppins', Arial, sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
+    animation: fadeIn 0.7s;
+}
+
+.nav-btns {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    justify-content: center;
+    width: 100%;
+    background: transparent;
+    margin-top: 2rem;
+}
+
+.nav-btns button {
+    padding: 0.7rem 1.3rem;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(90deg, #b2bec3 60%, #dfe6e9 100%);
+    color: #222;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, transform 0.15s;
+    font-family: 'Poppins', Arial, sans-serif;
+    box-shadow: 0 1px 4px #b2bec322;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+.nav-btns button::after {
+    content: "";
+    position: absolute;
+    left: 50%; top: 50%;
+    width: 0; height: 0;
+    background: rgba(255,255,255,0.3);
+    border-radius: 100%;
+    transform: translate(-50%, -50%);
+    transition: width 0.4s ease, height 0.4s ease, opacity 0.4s;
+    opacity: 0;
+    z-index: 0;
+}
+.nav-btns button:active::after {
+    width: 200px; height: 200px;
+    opacity: 1;
+    transition: 0s;
+}
+.nav-btns button.active, .nav-btns button:hover {
+    background: linear-gradient(90deg, #2193b0 60%, #6dd5ed 100%);
+    color: #fff;
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 4px 16px #2193b055;
+}
+
+.filter-bar {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    justify-content: center;
+    animation: fadeIn 0.7s;
+}
+
+.filter-bar input, .filter-bar button {
+    padding: 0.45rem 0.8rem;
+    border-radius: 6px;
+    border: 1.2px solid #b2bec3;
+    font-family: 'Poppins', Arial, sans-serif;
+    background: #f8fafc;
+    transition: border 0.2s, box-shadow 0.2s;
+}
+
+.filter-bar input:focus {
+    border: 1.2px solid #2193b0;
+    outline: none;
+    box-shadow: 0 2px 8px #2193b044;
+}
+
+.filter-bar button {
+    background: linear-gradient(90deg, #2193b0 60%, #6dd5ed 100%);
+    color: #fff;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+.filter-bar button::after {
+    content: "";
+    position: absolute;
+    left: 50%; top: 50%;
+    width: 0; height: 0;
+    background: rgba(255,255,255,0.3);
+    border-radius: 100%;
+    transform: translate(-50%, -50%);
+    transition: width 0.4s ease, height 0.4s ease, opacity 0.4s;
+    opacity: 0;
+    z-index: 0;
+}
+.filter-bar button:active::after {
+    width: 200px; height: 200px;
+    opacity: 1;
+    transition: 0s;
+}
+.filter-bar button:hover {
+    background: linear-gradient(90deg, #176b87 60%, #2193b0 100%);
+    transform: translateY(-2px) scale(1.04);
+}
+
+#rekapSection {
+    background: #fff;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 2rem 1rem;
+    margin-top: 0;
+    width: 100vw;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: fadeIn 0.7s;
+}
+
+.rekap-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    font-size: 0.97rem;
+    font-family: 'Poppins', Arial, sans-serif;
+    background: #f8fafc;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px #b2bec322;
+    animation: fadeIn 0.7s;
+}
+
+.rekap-table th, .rekap-table td {
+    border: 1px solid #b2bec3;
+    padding: 0.6rem 0.9rem;
+    text-align: center;
+}
+
+.rekap-table th {
+    background: linear-gradient(90deg, #2193b0 60%, #6dd5ed 100%);
+    color: #fff;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+/* Animasi pada input dan select */
+.absen-form input, .absen-form select {
+    transition: border 0.2s, box-shadow 0.2s, transform 0.15s;
+}
+.absen-form input:focus, .absen-form select:focus {
+    transform: scale(1.04);
+}
+
+/* Tombol dengan efek ripple */
+.absen-form button, .filter-bar button, .nav-btns button {
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+.absen-form button::after, .filter-bar button::after, .nav-btns button::after {
+    content: "";
+    position: absolute;
+    left: 50%; top: 50%;
+    width: 0; height: 0;
+    background: rgba(255,255,255,0.3);
+    border-radius: 100%;
+    transform: translate(-50%, -50%);
+    transition: width 0.4s ease, height 0.4s ease, opacity 0.4s;
+    opacity: 0;
+    z-index: 0;
+}
+.absen-form button:active::after, .filter-bar button:active::after, .nav-btns button:active::after {
+    width: 200px; height: 200px;
+    opacity: 1;
+    transition: 0s;
+}
+
+/* Hover efek lebih hidup */
+.absen-form button:hover, .filter-bar button:hover, .nav-btns button:hover {
+    filter: brightness(1.08) saturate(1.2);
+    letter-spacing: 0.5px;
+}
+
+/* Floating label style untuk input */
+.absen-form label {
+    position: relative;
+    left: 8px;
+    top: 2px;
+    background: #fff8;
+    padding: 0 6px;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: color 0.2s;
+}
+.absen-form input:focus + label,
+.absen-form select:focus + label {
+    color: #2193b0;
+}
+
+/* Animasi muncul pada .container dan .rekap-table */
+@keyframes popIn {
+    from { opacity: 0; transform: scale(0.96);}
+    to { opacity: 1; transform: scale(1);}
+}
+.container, .rekap-table {
+    animation: popIn 0.7s;
+}
+
+/* Efek shadow pada tabel saat hover */
+.rekap-table tr:hover {
+    background: #e3f6fd;
+    box-shadow: 0 2px 8px #2193b022;
+    transition: background 0.2s, box-shadow 0.2s;
+}
+
+/* Tooltip sederhana untuk tombol */
+.absen-form button[title]:hover::before,
+.filter-bar button[title]:hover::before,
+.nav-btns button[title]:hover::before {
+    content: attr(title);
+    position: absolute;
+    bottom: 110%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #2193b0;
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    opacity: 0.95;
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* Responsive improvement */
+@media (max-width: 600px) {
+    .container {
+        padding: 1.2rem 0.5rem;
+        width: 98vw;
+    }
+    .absen-form input, .absen-form select, .absen-form button {
+        width: 95vw;
+        max-width: 98vw;
+    }
+    .rekap-table th, .rekap-table td {
+        padding: 0.4rem 0.5rem;
+        font-size: 0.92rem;
+    }
+}
