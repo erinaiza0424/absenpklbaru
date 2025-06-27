@@ -45,10 +45,7 @@ module.exports = {
     port: 3001,
     historyApiFallback: true,
     open: true,
-    proxy: {
-      '/absen': 'http://localhost:3000',
-      '/absensi': 'http://localhost:3000',
-    },
+    // proxy dihapus, karena frontend-backend beda domain di production
   },
-  mode: 'development',
+  mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
 };
